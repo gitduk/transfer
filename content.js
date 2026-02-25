@@ -150,17 +150,25 @@
     `);
   }
 
-  function sendToBackground(message) {
-    return new Promise((resolve) => {
-      chrome.runtime.sendMessage(message, resolve);
-    });
+  function isExtensionValid() {
+    try {
+      return !!chrome.runtime?.id;
+    } catch {
+      return false;
+    }
   }
 
-  async function getApiKey() {
+  function sendToBackground(message) {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(["deeplApiKey"], (result) => {
-        resolve(result.deeplApiKey || "");
-      });
+      if (!isExtensionValid()) {
+        resolve({ error: "扩展已更新，请刷新页面" });
+        return;
+      }
+      try {
+        chrome.runtime.sendMessage(message, resolve);
+      } catch {
+        resolve({ error: "扩展已更新，请刷新页面" });
+      }
     });
   }
 
@@ -168,18 +176,11 @@
     const trimmed = text.trim();
     if (trimmed.length < MIN_TEXT_LENGTH) return;
 
-    const apiKey = await getApiKey();
-    if (!apiKey) {
-      showError(rect, "请先设置 DeepL API Key（点击扩展图标）");
-      return;
-    }
-
     showLoading(rect);
 
     const result = await sendToBackground({
       action: "translate",
       text: trimmed,
-      apiKey,
     });
 
     if (result.error) {

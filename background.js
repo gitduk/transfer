@@ -43,7 +43,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   (async () => {
     try {
-      const { text, apiKey } = message;
+      const { text } = message;
+
+      const { deeplApiKey: apiKey } = await chrome.storage.sync.get(["deeplApiKey"]);
+      if (!apiKey) {
+        sendResponse({ error: "请先设置 DeepL API Key（点击扩展图标）" });
+        return;
+      }
 
       const baseUrl = apiKey.endsWith(":fx")
         ? "https://api-free.deepl.com"
