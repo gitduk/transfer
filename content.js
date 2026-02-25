@@ -3,24 +3,13 @@
   const MIN_TEXT_LENGTH = 1;
   let debounceTimer = null;
 
-  function detectLanguage(text) {
-    const cjkCount = (text.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) || []).length;
-    const totalChars = text.replace(/\s/g, "").length;
-    if (totalChars === 0) return "en";
-    return cjkCount / totalChars > 0.3 ? "zh" : "en";
-  }
-
-  function langLabel(code) {
-    return code === "zh" ? "中文" : "English";
-  }
-
   function esc(text) {
     const d = document.createElement("div");
     d.textContent = text;
     return d.innerHTML;
   }
 
-  function fallbackCopy(text, btn) {
+  function fallbackCopy(text) {
     const textarea = document.createElement("textarea");
     textarea.value = text;
     textarea.style.cssText = "position:fixed;opacity:0;";
@@ -28,8 +17,6 @@
     textarea.select();
     document.execCommand("copy");
     textarea.remove();
-    btn.textContent = "Copied!";
-    setTimeout(() => { btn.textContent = "Copy"; }, 1500);
   }
 
   function removePopup() {
@@ -95,10 +82,10 @@
         const text = resultEl.textContent;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(onCopied).catch(() => {
-            fallbackCopy(text, copyBtn); onCopied();
+            fallbackCopy(text); onCopied();
           });
         } else {
-          fallbackCopy(text, copyBtn); onCopied();
+          fallbackCopy(text); onCopied();
         }
       });
     }
