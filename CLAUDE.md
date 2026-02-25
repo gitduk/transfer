@@ -4,35 +4,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Chrome extension for Chinese-English bidirectional translation. Select Chinese text to translate to English, select English text to translate to Chinese. Uses text selection context menu and popup display.
+Chrome extension (Manifest V3) for Chinese-English bidirectional translation using DeepL API. Select text on any webpage to auto-translate — Chinese to English or English to Chinese.
 
 ## Architecture
 
-- **Manifest V3** Chrome extension
-- `manifest.json` — extension config, permissions (contextMenus, activeTab, storage)
-- `background.js` — service worker handling context menu events and translation API calls
-- `content.js` — content script injected into pages, handles text selection and displays translation popup
-- `popup/` — extension popup UI (optional settings page)
-- `styles/` — CSS for translation popup overlay
+- `manifest.json` — extension config (permissions: contextMenus, activeTab, scripting, storage)
+- `background.js` — service worker: DeepL API calls, language detection, context menu, API key management
+- `content.js` — content script: text selection detection (mouseup), popup rendering (inline DOM), message passing to background
+- `popup/popup.html` + `popup/popup.js` — settings page for DeepL API Key input
 
 Translation flow:
-1. User selects text on page → content script detects selection
-2. Context menu click or keyboard shortcut triggers translation
-3. Background service worker calls translation API
-4. Result sent back to content script → displayed in floating popup near selection
+1. User selects text → content script detects selection via `mouseup` (300ms debounce)
+2. Content script sends `{ action: "translate", text }` to background via `chrome.runtime.sendMessage`
+3. Background reads API key from `chrome.storage.sync`, calls DeepL API, returns result
+4. Content script renders translated text in a floating popup near the selection
+
+All API calls go through the background service worker to avoid CORS restrictions. Content script never accesses `chrome.storage` or external APIs directly.
 
 ## Build & Development
 
-No build step required — load as unpacked extension in `chrome://extensions/` with Developer Mode enabled.
+No build step. Load as unpacked extension in `chrome://extensions/` with Developer Mode enabled. Reload extension after editing files. New pages need refresh to get updated content script.
 
-To test changes: reload the extension in `chrome://extensions/` after editing files.
-
-## Translation API
-
-Uses a free translation API (e.g., Google Translate unofficial API or MyMemory API) to avoid requiring API keys for basic usage. Language detection determines translation direction automatically.
+On `onInstalled`, background injects content.js into all existing tabs via `chrome.scripting.executeScript`.
 
 ## Key Conventions
 
-- All messages between content script and background use `chrome.runtime.sendMessage` / `chrome.runtime.onMessage`
-- Popup UI is injected via Shadow DOM to avoid CSS conflicts with host pages
-- Language detection: if selected text contains CJK characters (Unicode range `\u4e00-\u9fff`), translate to English; otherwise translate to Chinese
+- Bump `version` in manifest.json on every code change
+- Content script uses inline styles (no external CSS) to avoid host page conflicts
+- `stopPropagation()` on popup mouseup/mousedown prevents re-triggering translation
+- `chrome.runtime.id` check guards against "Extension context invalidated" errors after extension reload
+- Language detection in background: CJK character ratio > 0.3 → translate to English, otherwise to Chinese
+- DeepL API key ending in `:fx` routes to `api-free.deepl.com`, otherwise `api.deepl.com`
