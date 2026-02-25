@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 320px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 20px;
+    color: #333;
+  }
+  h1 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1a1a1a;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+  }
+  input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus { border-color: #4285f4; }
+  .hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .hint a { color: #4285f4; text-decoration: none; }
+  .hint a:hover { text-decoration: underline; }
+  button {
+    width: 100%;
+    margin-top: 16px;
+    padding: 8px;
+    background: #4285f4;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button:hover { background: #3367d6; }
+  .status {
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: center;
+    min-height: 18px;
+  }
+  .status.ok { color: #34a853; }
+  .status.err { color: #d93025; }
+</style>
+</head>
+<body>
+  <h1>中英互译 Settings</h1>
+  <label for="apikey">DeepL API Key</label>
+  <input type="password" id="apikey" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx">
+  <div class="hint">
+    免费注册获取：<a href="https://www.deepl.com/pro-api" target="_blank">deepl.com/pro-api</a><br>
+    Free 版每月 50 万字符
+  </div>
+  <button id="save">保存 / Save</button>
+  <div class="status" id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
