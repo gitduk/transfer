@@ -73,7 +73,8 @@
     const span = document.createElement("span");
     span.setAttribute(TRANSLATED_ATTR, "true");
     span.textContent = translatedText;
-    span.style.cssText = "border-bottom: 1.5px dashed #4285f4; cursor: pointer;";
+    span.style.cssText =
+      "border-bottom: 1.5px dashed #4285f4; cursor: pointer;";
     span.title = "点击切换原文/译文";
 
     let showingTranslation = true;
@@ -172,20 +173,26 @@
       justify-content: center;
       transition: background 0.15s, box-shadow 0.15s;
     `;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>';
+    btn.innerHTML =
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6"/><path d="M4 14l6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="M22 22l-5-10-5 10"/><path d="M14 18h6"/></svg>';
 
     btn.addEventListener("mouseenter", () => {
       btn.style.background = "#f0f6ff";
-      btn.style.boxShadow = "0 2px 12px rgba(66,133,244,0.25), 0 0 0 1px rgba(66,133,244,0.15)";
+      btn.style.boxShadow =
+        "0 2px 12px rgba(66,133,244,0.25), 0 0 0 1px rgba(66,133,244,0.15)";
     });
     btn.addEventListener("mouseleave", () => {
       btn.style.background = "#fff";
-      btn.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)";
+      btn.style.boxShadow =
+        "0 2px 8px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)";
     });
 
     btn.addEventListener("mouseup", (e) => e.stopPropagation());
     // preventDefault keeps the browser from collapsing the selection on mousedown
-    btn.addEventListener("mousedown", (e) => { e.stopPropagation(); e.preventDefault(); });
+    btn.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    });
 
     // Save range upfront — by click time the selection may already be collapsed
     const savedRange = range.cloneRange();
@@ -199,18 +206,36 @@
 
     function cleanup() {
       document.removeEventListener("mousedown", onOutside);
+      document.removeEventListener("mouseup", onOutsideUp);
       document.removeEventListener("keydown", onKey);
     }
     function onOutside(e) {
-      if (e.target !== btn && !btn.contains(e.target)) { removeTrigger(); cleanup(); }
+      if (e.target !== btn && !btn.contains(e.target)) {
+        removeTrigger();
+        cleanup();
+      }
+    }
+    function onOutsideUp(e) {
+      if (e.target !== btn && !btn.contains(e.target)) {
+        // After mouseup elsewhere, check if selection was cleared
+        setTimeout(() => {
+          const sel = window.getSelection();
+          if (!sel || sel.isCollapsed) {
+            removeTrigger();
+            cleanup();
+          }
+        }, 10);
+      }
     }
     function onKey(e) {
-      if (e.key === "Escape") { removeTrigger(); cleanup(); }
+      if (e.key === "Escape") {
+        removeTrigger();
+        cleanup();
+      }
     }
-    setTimeout(() => {
-      document.addEventListener("mousedown", onOutside);
-      document.addEventListener("keydown", onKey);
-    }, 100);
+    document.addEventListener("mousedown", onOutside);
+    document.addEventListener("mouseup", onOutsideUp);
+    document.addEventListener("keydown", onKey);
   }
 
   // Show trigger button on text selection (mouseup)
@@ -230,7 +255,8 @@
       // Ignore if selection is inside a translated span
       const anchor = selection.anchorNode;
       if (anchor) {
-        const el = anchor.nodeType === Node.ELEMENT_NODE ? anchor : anchor.parentElement;
+        const el =
+          anchor.nodeType === Node.ELEMENT_NODE ? anchor : anchor.parentElement;
         if (el && el.closest(`[${TRANSLATED_ATTR}]`)) return;
       }
 
@@ -258,7 +284,12 @@
       if (!text) return;
 
       const range = selection.getRangeAt(0).cloneRange();
-      translateInline(text, range, window.innerWidth / 2, window.innerHeight / 2);
+      translateInline(
+        text,
+        range,
+        window.innerWidth / 2,
+        window.innerHeight / 2,
+      );
     }
   });
 })();
