@@ -75,6 +75,7 @@
     span.textContent = translatedText;
     span.style.cssText =
       "border-bottom: 1.5px dashed #4285f4; cursor: pointer;";
+    // blue = translation, green = original
     span.title = "点击切换原文/译文";
 
     let showingTranslation = true;
@@ -82,7 +83,7 @@
       e.stopPropagation();
       if (showingTranslation) {
         span.textContent = originalText;
-        span.style.borderBottomColor = "#999";
+        span.style.borderBottomColor = "#34a853";
       } else {
         span.textContent = translatedText;
         span.style.borderBottomColor = "#4285f4";

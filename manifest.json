@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "中英互译 - CN/EN Translator",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Select text to translate between Chinese and English using DeepL.",
   "permissions": ["contextMenus", "activeTab", "scripting", "storage"],
   "host_permissions": [
