@@ -117,8 +117,8 @@
     const trimmed = text.trim();
     if (trimmed.length < MIN_TEXT_LENGTH) return;
 
-    // Save range contents so we can restore on error
-    const originalText = trimmed;
+    // Get original text from range to preserve leading/trailing whitespace
+    const originalText = range.toString();
 
     // Show inline loading
     const loadingSpan = showInlineLoading(range);
@@ -135,12 +135,17 @@
       loadingSpan.removeAttribute(TRANSLATED_ATTR);
       showToast(mouseX, mouseY, result.error, true);
     } else {
+      // Preserve leading/trailing whitespace from original selection
+      const leadingSpace = originalText.match(/^\s*/)[0];
+      const trailingSpace = originalText.match(/\s*$/)[0];
+      const paddedTranslation = leadingSpace + result.translated + trailingSpace;
+
       // Replace loading with translated span
       const parent = loadingSpan.parentNode;
       if (parent) {
         const newRange = document.createRange();
         newRange.selectNode(loadingSpan);
-        replaceWithTranslation(newRange, originalText, result.translated);
+        replaceWithTranslation(newRange, originalText, paddedTranslation);
       }
     }
   }
